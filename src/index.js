@@ -1,9 +1,10 @@
+
 import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { regisrtateValidator, loginValidator, postCreatValidator } from './validation.js';
+import { regisrtateValidator, loginValidator, postCreatValidator } from './validations.js';
 import checkAuth from './utils/checkAuth.js';
 import * as UserController from './controllers/userController.js';
 import * as postController from './controllers/postController.js';
@@ -12,28 +13,11 @@ import cors from 'cors';
 import fs from 'fs';
 
 mongoose
-  .connect(
-    'mongodb+srv://erasylzurgambaev:erazenazuziko@cluster0.lctwdii.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0'
-  )
+  .connect('mongodb+srv://erasylzurgambaev:erazenazuziko@cluster0.lctwdii.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0')
   .then(() => console.log('DB ok'))
   .catch((err) => console.log('DB err', err));
 
 const app = express();
-
-app.use(cors());
-app.use(express.json()); // Позволяет читать JSON файлы
-
-// Получение пути текущего модуля и преобразование его в путь к директории
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Проверьте и создайте директорию 'uploads', если она не существует
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-
-app.use('/uploads', express.static('uploads')); // Сервер статических файлов
 
 const storage = multer.diskStorage({
   destination: (_, __, cb) => {
@@ -43,27 +27,29 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   }
 });
-
 const upload = multer({ storage });
+app.use(express.json()); // Позволяет читать JSON файлы
+
+app.use(cors());
+
+app.use('/uploads', express.static('uploads')); // Сервер статических файлов   
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Проверьте и создайте директорию 'uploads', если она не существует
+
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
     res.json({
       url: `/uploads/${req.file.originalname}`,
     });
-  } catch (err) {
-    console.error('File upload error:', err);
-    res.status(500).json({ message: 'File upload failed' });
-  }
 });
 
 app.post('/auth/login', loginValidator, handleValidationErrors, UserController.login);
 app.post('/auth/register', regisrtateValidator, handleValidationErrors, UserController.register);
 app.get('/auth/me', checkAuth, UserController.getMe);
+app.get('/tags', postController.getLastTags);
+app.get('/posts/tags', postController.getLastTags);
 
 app.get('/posts', postController.getAll);
 app.get('/posts/:id', postController.getOne);
@@ -77,7 +63,6 @@ app.listen(3050, (err) => {
   }
   console.log("Server running on port 3050");
 });
-
 
 
 // import express from 'express';

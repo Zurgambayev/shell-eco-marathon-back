@@ -78,21 +78,25 @@ export const login = async(req,res) => {
     }
 }
 
-export const getMe = async(req,res) => {
-    try{
-        const user = await UserModel.findById(req.userID)
-        if(!user){
+export const getMe = async (req, res) => {
+    try {
+        console.log("User ID from request:", req.userId); // Лог для проверки userId
+        const user = await UserModel.findById(req.userId);
+
+        if (!user) {
             return res.status(404).json({
-                message:"пользовотель не нашелся"
-            })
+                message: "пользователь не нашелся",
+            });
         }
-        const{passwordHash, ...userData} = user._doc
-        res.json(userData); 
-    }catch(err){
-        console.log(err)
+
+        const { passwordHash, ...userData } = user._doc;
+        console.log("User data to return:", userData); // Лог для проверки userData
+        res.json(userData);
+    } catch (err) {
+        console.log(err);
         res.status(500).json({
-            message:'нет доступа '
-        })
+            message: 'нет доступа',
+        });
     }
-}
+};
 
