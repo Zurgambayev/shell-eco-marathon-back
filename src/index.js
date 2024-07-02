@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
@@ -11,9 +14,12 @@ import * as commentController from './controllers/commentController.js';
 import handleValidationErrors from './utils/handleValidationErrors.js';
 import cors from 'cors';
 import fs from 'fs';
-// .connect(process.env.MONGODB_URL)
+
+// Логирование переменных окружения для отладки
+console.log('MONGODB_URI:', process.env.MONGODB_URI); // Для отладки
+console.log('PORT:', process.env.PORT); // Для отладки
+
 mongoose
-  // .connect('mongodb+srv://erasylzurgambaev:erazenazuziko@cluster0.lctwdii.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0')
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('DB ok'))
   .catch((err) => console.log('DB err', err));
@@ -65,9 +71,11 @@ app.post('/posts/:postId/comments', checkAuth, commentController.addComment);
 app.get('/posts/:postId/comments', commentController.getComments);
 app.delete('/comments/:commentId', checkAuth, commentController.removeComment);
 
-app.listen(process.env.PORT  || 3050, (err) => {
+const PORT = process.env.PORT || 3050;
+
+app.listen(PORT, (err) => {
   if (err) {
     return console.log(err);
   }
-  console.log("Server running on port 3050");
+  console.log(`Server running on port ${PORT}`);
 });
