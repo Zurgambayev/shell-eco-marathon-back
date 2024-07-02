@@ -90,7 +90,7 @@ export const getMe = async (req, res) => {
         }
 
         const { passwordHash, ...userData } = user._doc;
-        console.log("User data to return:", userData); // Лог для проверки userData
+        // console.log("User data to return:", userData); // Лог для проверки userData
         res.json(userData);
     } catch (err) {
         console.log(err);
