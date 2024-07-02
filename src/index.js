@@ -11,9 +11,10 @@ import * as commentController from './controllers/commentController.js';
 import handleValidationErrors from './utils/handleValidationErrors.js';
 import cors from 'cors';
 import fs from 'fs';
-
+// .connect(process.env.MONGODB_URL)
 mongoose
-  .connect('mongodb+srv://erasylzurgambaev:erazenazuziko@cluster0.lctwdii.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0')
+  // .connect('mongodb+srv://erasylzurgambaev:erazenazuziko@cluster0.lctwdii.mongodb.net/blog?retryWrites=true&w=majority&appName=Cluster0')
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log('DB ok'))
   .catch((err) => console.log('DB err', err));
 
@@ -64,7 +65,7 @@ app.post('/posts/:postId/comments', checkAuth, commentController.addComment);
 app.get('/posts/:postId/comments', commentController.getComments);
 app.delete('/comments/:commentId', checkAuth, commentController.removeComment);
 
-app.listen(3050, (err) => {
+app.listen(process.env.PORT  || 3050, (err) => {
   if (err) {
     return console.log(err);
   }
